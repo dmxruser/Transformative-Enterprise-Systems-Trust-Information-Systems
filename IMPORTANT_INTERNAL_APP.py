@@ -1,10 +1,16 @@
 import tkinter as tk
 from tkinter import ttk
 
+# Define dummy valid credentials for demonstration purposes.
+# In a real application, these would come from a secure backend (e.g., database, API).
+VALID_USERNAME = "user"
+VALID_PASSWORD = "password123" # A simple dummy password
+
 def get_credentials(username_field, password_field, output_label):
     """
-    Retrieves the text from both the username and password fields and
-    updates a display label with the retrieved information.
+    Retrieves the text from both the username and password fields,
+    attempts a basic authentication against dummy credentials, and
+    updates a display label with the result.
     """
     username = username_field.get()
     password = password_field.get()
@@ -13,11 +19,20 @@ def get_credentials(username_field, password_field, output_label):
     username_field.delete(0, tk.END)
     password_field.delete(0, tk.END)
 
-    # Update the label in the GUI instead of just printing to the console
-    output_label.config(
-        text=f"Username Entered: '{username}'\nPassword Retrieved (Masked): '{password}'"
-    )
-    # Note: In a real application, you would handle authentication here.
+    # --- Authentication Logic ---
+    if username == VALID_USERNAME and password == VALID_PASSWORD:
+        output_label.config(
+            text=f"Login Successful! Welcome, {username}!",
+            foreground='green' # Indicate success with green text
+        )
+    else:
+        output_label.config(
+            text="Login Failed: Invalid username or password.",
+            foreground='red' # Indicate failure with red text
+        )
+    # Note: In a real application, you would handle authentication with a secure backend
+    # using hashing for passwords and proper session management. This is a basic
+    # implementation to address the user's immediate inability to "log in".
 
 # --- GUI Setup ---
 
@@ -49,7 +64,7 @@ password_entry.pack(pady=(0, 20), fill='x')
 # 3. Output Label
 output_display = ttk.Label(
     main_frame,
-    text="Credentials will appear here.",
+    text="Enter credentials and click 'Submit'.\n(Hint: 'user' / 'password123')", # Added hint
     foreground='#333333',
     justify=tk.LEFT
 )
