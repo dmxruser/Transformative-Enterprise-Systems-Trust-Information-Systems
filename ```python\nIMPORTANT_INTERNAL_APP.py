@@ -1,0 +1,232 @@
+import tkinter as tk
+from tkinter import ttk
+
+# Define dummy valid credentials for demonstration purposes.
+# In a real application, these would come from a secure backend (e.g., database, API).
+VALID_USERNAME = "user"
+VALID_PASSWORD = "password123" # A simple dummy password
+
+# --- Placeholder functions for Trust Checker and Trust Revisoner ---
+
+def check_trust(entity_input_field, output_label):
+    """
+    Simulates checking the trust level of an entity or data.
+    In a real application, this would query a trust database or API
+    based on the provided entity/data identifier.
+    """
+    entity = entity_input_field.get().strip()
+    entity_input_field.delete(0, tk.END) # Clear input after processing
+
+    if not entity:
+        output_label.config(text="Please enter an entity or data identifier to check.", foreground='orange')
+        return
+
+    # Dummy logic for demonstration purposes:
+    if "critical_system" in entity.lower() or "high_risk_data" in entity.lower():
+        trust_score = "Low (Requires Immediate Review - Risk Identified)"
+        color = 'red'
+    elif "trusted_partner" in entity.lower() or "verified_user" in entity.lower():
+        trust_score = "High (Verified and Compliant)"
+        color = 'green'
+    elif "test_entity" in entity.lower() or "staging_data" in entity.lower():
+        trust_score = "Unknown (Development Environment - No Production Trust)"
+        color = 'blue'
+    else:
+        trust_score = f"Medium (Default for '{entity}' - Further Analysis Recommended)"
+        color = '#333333' # Dark grey
+
+    output_label.config(
+        text=f"Trust Check Report for '{entity}':\nTrust Level: {trust_score}\n(This is a simulated result and does not reflect real-world trust.)",
+        foreground=color
+    )
+
+def revise_trust(entity_input_field, new_trust_level_combo, revision_reason_field, output_label):
+    """
+    Simulates revising the trust level of an entity or data.
+    In a real application, this would involve updating a secure trust database
+    and logging the revision for audit purposes.
+    """
+    entity = entity_input_field.get().strip()
+    new_trust_level = new_trust_level_combo.get()
+    reason = revision_reason_field.get("1.0", tk.END).strip() # Get text from Text widget
+
+    entity_input_field.delete(0, tk.END)
+    # new_trust_level_combo.set('') # Could reset if desired, or leave last selected
+    revision_reason_field.delete("1.0", tk.END) # Clear text area
+
+    if not entity or not new_trust_level or not reason:
+        output_label.config(text="Please fill in all fields (Entity, New Trust Level, Reason for Revision).", foreground='orange')
+        return
+    if len(reason) < 10: # Simple validation for a meaningful reason
+        output_label.config(text="Please provide a more detailed reason for the trust revision (min 10 characters).", foreground='orange')
+        return
+
+    # Dummy logic for demonstration purposes:
+    output_label.config(
+        text=f"Trust Revision Submitted for '{entity}':\nNew Trust Level: {new_trust_level}\nReason: {reason}\nStatus: Pending Approval (Simulated)",
+        foreground='blue'
+    )
+
+# --- GUI Setup ---
+
+root = tk.Tk()
+root.title("Transformative Enterprise Systems & Trust Information Systems")
+root.geometry("800x600") # Increased size to accommodate new features
+root.resizable(True, True)
+
+# Configure style for a modern look
+style = ttk.Style()
+style.configure('TFrame', background='#f0f0f0')
+style.configure('TLabel', background='#f0f0f0', font=('Inter', 10))
+style.configure('TButton', font=('Inter', 10, 'bold'), padding=5)
+style.configure('TEntry', font=('Inter', 10))
+style.configure('TCombobox', font=('Inter', 10))
+style.configure('TNotebook', background='#e0e0e0')
+style.configure('TNotebook.Tab', font=('Inter', 10, 'bold'), padding=[10, 5])
+style.map('TNotebook.Tab',
+          background=[('selected', '#d0d0d0')],
+          foreground=[('selected', 'black')])
+
+# --- Frames for Login and Main Application ---
+# We use two frames and switch their visibility after login
+login_frame = ttk.Frame(root, padding="20 20 20 20")
+app_frame = ttk.Frame(root, padding="10 10 10 10") # Frame for the main application content
+
+# Initially show login frame, hide app frame
+login_frame.pack(fill='both', expand=True)
+app_frame.pack_forget()
+
+def show_main_app():
+    """Hides the login frame and displays the main application frame."""
+    login_frame.pack_forget()
+    app_frame.pack(fill='both', expand=True)
+
+def show_login_screen():
+    """Hides the main application frame and displays the login frame."""
+    app_frame.pack_forget()
+    login_frame.pack(fill='both', expand=True)
+    login_output_display.config(text="Enter credentials and click 'Submit'.\n(Hint: 'user' / 'password123')", foreground='#333333')
+    username_entry.focus()
+
+
+def authenticate_and_switch(username_field, password_field, output_label):
+    """
+    Authenticates user credentials and, upon success, transitions
+    to the main application view.
+    """
+    username = username_field.get()
+    password = password_field.get()
+
+    username_field.delete(0, tk.END)
+    password_field.delete(0, tk.END)
+
+    if username == VALID_USERNAME and password == VALID_PASSWORD:
+        output_label.config(
+            text=f"Login Successful! Welcome, {username}!",
+            foreground='green'
+        )
+        # After successful login, transition to the main application after a short delay
+        root.after(700, show_main_app) # Give user a moment to see the success message
+    else:
+        output_label.config(
+            text="Login Failed: Invalid username or password.",
+            foreground='red'
+        )
+
+# --- Login UI Components (inside login_frame) ---
+ttk.Label(login_frame, text="Username:").pack(pady=(5, 0), anchor='w')
+username_entry = ttk.Entry(login_frame, width=40)
+username_entry.pack(pady=(0, 10), fill='x')
+username_entry.focus() # Set initial focus
+
+ttk.Label(login_frame, text="Password:").pack(pady=(5, 0), anchor='w')
+password_entry = ttk.Entry(login_frame, width=40, show='*') # Mask password input
+password_entry.pack(pady=(0, 20), fill='x')
+
+login_output_display = ttk.Label(
+    login_frame,
+    text="Enter credentials and click 'Submit'.\n(Hint: 'user' / 'password123')",
+    foreground='#333333',
+    justify=tk.LEFT
+)
+login_output_display.pack(pady=(10, 5), fill='x', anchor='w')
+
+login_button = ttk.Button(
+    login_frame,
+    text="Submit Credentials",
+    command=lambda: authenticate_and_switch(username_entry, password_entry, login_output_display)
+)
+login_button.pack(pady=10)
+
+# --- Main Application UI (inside app_frame) ---
+
+# Create a Notebook (tabbed interface) to organize Trust Checker and Trust Revisoner
+notebook = ttk.Notebook(app_frame)
+notebook.pack(fill='both', expand=True, pady=10, padx=10)
+
+# --- Trust Checker Tab ---
+trust_checker_frame = ttk.Frame(notebook, padding="15 15 15 15")
+notebook.add(trust_checker_frame, text='Trust Checker')
+
+ttk.Label(trust_checker_frame, text="Entity/Data for Trust Check:").pack(pady=(10, 0), anchor='w')
+entity_check_entry = ttk.Entry(trust_checker_frame, width=50)
+entity_check_entry.pack(pady=(0, 10), fill='x')
+
+check_trust_button = ttk.Button(
+    trust_checker_frame,
+    text="Check Trust",
+    command=lambda: check_trust(entity_check_entry, trust_check_output_display)
+)
+check_trust_button.pack(pady=5)
+
+trust_check_output_display = ttk.Label(
+    trust_checker_frame,
+    text="Enter an entity or data identifier (e.g., 'critical_system', 'trusted_partner') and click 'Check Trust'.",
+    wraplength=700, # Wrap text for better readability
+    justify=tk.LEFT
+)
+trust_check_output_display.pack(pady=(10, 5), fill='x', anchor='w')
+
+# --- Trust Revisoner Tab ---
+trust_revisoner_frame = ttk.Frame(notebook, padding="15 15 15 15")
+notebook.add(trust_revisoner_frame, text='Trust Revisoner')
+
+ttk.Label(trust_revisoner_frame, text="Entity/Data to Revise Trust:").pack(pady=(10, 0), anchor='w')
+entity_revise_entry = ttk.Entry(trust_revisoner_frame, width=50)
+entity_revise_entry.pack(pady=(0, 10), fill='x')
+
+ttk.Label(trust_revisoner_frame, text="New Trust Level:").pack(pady=(10, 0), anchor='w')
+trust_levels = ["High Trust", "Medium Trust", "Low Trust", "Blocked", "Unverified"]
+new_trust_level_combo = ttk.Combobox(trust_revisoner_frame, values=trust_levels, width=47, state="readonly") # Make combobox read-only to prevent arbitrary input
+new_trust_level_combo.pack(pady=(0, 10), fill='x')
+new_trust_level_combo.set("Medium Trust") # Set a default value
+
+ttk.Label(trust_revisoner_frame, text="Reason for Revision:").pack(pady=(10, 0), anchor='w')
+# Using a Text widget for multi-line input for the reason
+revision_reason_text = tk.Text(trust_revisoner_frame, height=5, width=50, font=('Inter', 10))
+revision_reason_text.pack(pady=(0, 10), fill='x')
+
+revise_trust_button = ttk.Button(
+    trust_revisoner_frame,
+    text="Revise Trust",
+    command=lambda: revise_trust(entity_revise_entry, new_trust_level_combo, revision_reason_text, trust_revise_output_display)
+)
+revise_trust_button.pack(pady=5)
+
+trust_revise_output_display = ttk.Label(
+    trust_revisoner_frame,
+    text="Enter an entity, select a new trust level, provide a detailed reason, then click 'Revise Trust'.",
+    wraplength=700,
+    justify=tk.LEFT
+)
+trust_revise_output_display.pack(pady=(10, 5), fill='x', anchor='w')
+
+# --- Logout Button (placed below the notebook in app_frame) ---
+logout_button = ttk.Button(
+    app_frame,
+    text="Logout",
+    command=show_login_screen
+)
+logout_button.pack(pady=(20, 10))
+
+root.mainloop()
